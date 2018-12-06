@@ -56,7 +56,9 @@ add_subdirectory(src/xmregcore)
 
 
 set(SOURCE_FILES
-        main.cpp)
+        main.cpp
+        src/utils.cpp
+        src/foundobjectprocessor.cpp)
 
 add_executable(${PROJECT_NAME}
         ${SOURCE_FILES})

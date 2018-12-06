@@ -1,4 +1,4 @@
-#include "src/utils.hpp"
+#include "src/foundobjectprocessor.h"
 
 #include <iostream>
 
@@ -53,6 +53,10 @@ if (!found_object.which())
 
     return EXIT_SUCCESS;
 }
+
+xmreg::FoundObjectProcessor obj_processor;
+
+boost::apply_visitor(obj_processor, found_object);
 
 cout << "Program finished.\n";
 
