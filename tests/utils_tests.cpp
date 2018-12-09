@@ -27,9 +27,9 @@ TEST(MAKE_ACCOUNT, AddressViewkeySpendky)
     auto account = make_account(input);
 
     EXPECT_TRUE(account);
-    EXPECT_EQ(account->ai2str(), address);
-    EXPECT_EQ(account->vk2str(), viewkey);
-    EXPECT_EQ(account->sk2str(), spendkey);
+    EXPECT_EQ(account.ai2str(), address);
+    EXPECT_EQ(account.vk2str(), viewkey);
+    EXPECT_EQ(account.sk2str(), spendkey);
 }
 
 TEST(MAKE_ACCOUNT, AddressViewkey)
@@ -39,9 +39,9 @@ TEST(MAKE_ACCOUNT, AddressViewkey)
     auto account = make_account(input);
 
     EXPECT_TRUE(account);
-    EXPECT_EQ(account->ai2str(), address);
-    EXPECT_EQ(account->vk2str(), viewkey);
-    EXPECT_FALSE(account->sk());
+    EXPECT_EQ(account.ai2str(), address);
+    EXPECT_EQ(account.vk2str(), viewkey);
+    EXPECT_FALSE(account.sk());
 }
 
 TEST(MAKE_ACCOUNT, Address)
@@ -51,9 +51,9 @@ TEST(MAKE_ACCOUNT, Address)
     auto account = make_account(input);
 
     EXPECT_TRUE(account);
-    EXPECT_EQ(account->ai2str(), address);
-    EXPECT_FALSE(account->vk());
-    EXPECT_FALSE(account->sk());
+    EXPECT_EQ(account.ai2str(), address);
+    EXPECT_FALSE(account.vk());
+    EXPECT_FALSE(account.sk());
 }
 
 TEST(MAKE_ACCOUNT, WrongAddress)

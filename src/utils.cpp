@@ -110,7 +110,7 @@ get_tx_or_blk(MicroCore const& mcore, crypto::hash const& a_hash)
     return found_object;
 }
 
-boost::optional<Account>
+Account
 make_account(string const& account_info,
              network_type ntype,
              string const& split_by)
@@ -123,7 +123,7 @@ make_account(string const& account_info,
     if (splitted.empty())
         return {};
 
-    boost::optional<Account> acc;
+    Account acc;
 
     try
     {
