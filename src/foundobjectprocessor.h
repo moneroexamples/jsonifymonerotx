@@ -3,19 +3,26 @@
 
 #include "utils.hpp"
 
+#include "ext/json.hpp"
+
 namespace xmreg
 {
 
-class FoundObjectProcessor: public boost::static_visitor<>
+using json = nlohmann::json;
+
+class FoundObjectProcessor: public boost::static_visitor<json>
 {
 public:
-    FoundObjectProcessor();
+    FoundObjectProcessor(MicroCore* _mcore);
 
-    void operator()(boost::blank) const;
+    json operator()(boost::blank) const;
 
-    void operator()(transaction const& tx) const;
+    json operator()(transaction const& tx) const;
 
-    void operator()(block const& blk) const;
+    json operator()(block const& blk) const;
+
+protected:
+    MicroCore* mcore {nullptr};
 };
 
 }

@@ -1,5 +1,7 @@
 #include "utils.hpp"
 
+#include "boost/algorithm/string.hpp"
+
 namespace xmreg
 {
 
@@ -106,6 +108,45 @@ get_tx_or_blk(MicroCore const& mcore, crypto::hash const& a_hash)
     }
 
     return found_object;
+}
+
+boost::optional<Account>
+make_account(network_type ntype,
+             string const& account_info,
+             string const& split_by)
+{
+    vector<string> splitted;
+
+    boost::split(splitted, account_info,
+                 boost::is_any_of(split_by));
+
+    if (splitted.empty())
+        return {};
+
+    boost::optional<Account> acc;
+
+    try
+    {
+        switch(splitted.size())
+        {
+        case 3:
+            acc = Account(ntype, splitted[0], splitted[1], splitted[2]);
+            break;
+        case 2:
+            acc = Account(ntype, splitted[0], splitted[1]);
+            break;
+        case 1:
+            acc = Account(ntype, splitted[0]);
+            break;
+        }
+    }
+    catch (std::runtime_error const& e)
+    {
+        cerr << e.what() << '\n';
+    }
+
+    return acc;
+
 }
 
 }
