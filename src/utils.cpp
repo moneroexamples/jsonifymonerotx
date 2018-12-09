@@ -111,8 +111,8 @@ get_tx_or_blk(MicroCore const& mcore, crypto::hash const& a_hash)
 }
 
 boost::optional<Account>
-make_account(network_type ntype,
-             string const& account_info,
+make_account(string const& account_info,
+             network_type ntype,
              string const& split_by)
 {
     vector<string> splitted;
