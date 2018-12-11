@@ -13,14 +13,12 @@ process_program_options(int argc, const char *argv[])
     options["help"] = false;
     options["error"] = false;
     options["nettype"] = network_type::STAGENET;
+    options["hash"] = ""s;
+    options["sender"] = ""s;
+    options["respients"] = vector<string>{};
 
     options["blockchain_path"] = xmreg::get_default_lmdb_folder(
                 any_cast<network_type>(options["nettype"]));
-
-    string hash_str;
-    string sender_str;
-
-    fs::path blckchain_path;
 
     try
     {
@@ -37,6 +35,8 @@ process_program_options(int argc, const char *argv[])
                  any_cast<string>(options["blockchain_path"])),
              "Path to lmdb folder containing the blockchain")
             ("sender,s", po::value<string>(),
+            "Optinal sender's address,viewkey,spendkey")
+            ("recipients,r", po::value<vector<string>>()->multitoken(),
             "Optinal sender's address,viewkey,spendkey");
 
         po::positional_options_description pos_desc;
@@ -66,6 +66,10 @@ process_program_options(int argc, const char *argv[])
 
         if (vm.count("sender"))
             options["sender"] = vm["sender"].as<string>();
+
+        if (vm.count("recipients"))
+            options["recipients"] = vm["recipients"].as<vector<string>>();
+
     }
     catch (po::error const& ex)
     {
@@ -110,34 +114,33 @@ get_tx_or_blk(MicroCore const& mcore, crypto::hash const& a_hash)
     return found_object;
 }
 
-Account
-make_account(string const& account_info,
-             network_type ntype,
+unique_ptr<Account>
+make_account(string const& account_info,           
              string const& split_by)
 {
+   unique_ptr<Account> acc;
+
+    if (account_info.empty())
+        return nullptr;
+
     vector<string> splitted;
 
     boost::split(splitted, account_info,
                  boost::is_any_of(split_by));
 
     if (splitted.empty())
-        return {};
-
-    Account acc;
+        return nullptr;
 
     try
     {
         switch(splitted.size())
         {
-        case 3:
-            acc = Account(ntype, splitted[0], splitted[1], splitted[2]);
-            break;
+        case 3:            
+            return account_factory(splitted[0], splitted[1], splitted[2]);
         case 2:
-            acc = Account(ntype, splitted[0], splitted[1]);
-            break;
+            return account_factory(splitted[0], splitted[1]);
         case 1:
-            acc = Account(ntype, splitted[0]);
-            break;
+            return account_factory(splitted[0]);
         }
     }
     catch (std::runtime_error const& e)
@@ -145,7 +148,7 @@ make_account(string const& account_info,
         cerr << e.what() << '\n';
     }
 
-    return acc;
+    return nullptr;
 
 }
 

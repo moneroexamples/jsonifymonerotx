@@ -35,9 +35,8 @@ process_program_options(int argc, const char *argv[]);
 boost::variant<boost::blank, transaction, block>
 get_tx_or_blk(MicroCore const& mcore, crypto::hash const& a_hash);
 
-Account
+unique_ptr<Account>
 make_account(string const& account_info,
-             network_type ntype = network_type::STAGENET,
              string const& split_by = ",");
 }
 

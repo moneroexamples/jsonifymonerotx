@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+using xmreg::operator<<;
+
 using epee::string_tools::hex_to_pod;
 using epee::string_tools::pod_to_hex;
 using boost::any_cast;
@@ -26,6 +28,13 @@ auto net_type        = any_cast<network_type>(options["nettype"]);
 auto blockchain_path = any_cast<fs::path>(options["blockchain_path"]);
 auto hash_str        = any_cast<string>(options["hash"]);
 auto sender_str      = any_cast<string>(options["sender"]);
+auto recipients_vstr      = any_cast<vector<string>>(options["recipients"]);
+
+if (hash_str.empty())
+{
+    cerr << "Transaction or block hash not given!\n";
+    return EXIT_SUCCESS;
+}
 
 cout << "Blockchain path: " << blockchain_path << '\n';
 
@@ -43,9 +52,9 @@ if (!hex_to_pod(hash_str, a_hash))
 }
 
 cout << "Initializaing MicroCore\n";
-xmreg::MicroCore mcore {blockchain_path.string(), net_type};
+auto mcore = make_unique<xmreg::MicroCore>(blockchain_path.string(), net_type);
 
-auto found_object = get_tx_or_blk(mcore, a_hash);
+auto found_object = get_tx_or_blk(*mcore, a_hash);
 
 if (!found_object.which())
 {
@@ -55,11 +64,39 @@ if (!found_object.which())
     return EXIT_SUCCESS;
 }
 
-xmreg::FoundObjectProcessor obj_processor {&mcore};
+auto sender = xmreg::make_account(sender_str);
+
+if (sender)
+    cout << "Sender: " << *sender << '\n';
+else
+    cout << "Sender's info not given or incorrect. "
+            "Will proceed without it." << sender_str << '\n';
+
+
+vector<unique_ptr<xmreg::Account>> recipients;
+
+if (!recipients_vstr.empty())
+{
+    for (auto const& recipient_str: recipients_vstr)
+    {
+        auto recpient = xmreg::make_account(recipient_str);
+
+        if (recpient)
+            cout << "Recipient: " << *recpient << '\n';
+        else
+            cout << "Recpient's info not given or incorrect. "
+                    "Will proceed without it:" << recipient_str << '\n';
+
+        recipients.push_back(std::move(recpient));
+    }
+}
+
+xmreg::FoundObjectProcessor obj_processor {
+    std::move(mcore), std::move(sender), std::move(recipients)};
 
 auto jobj = boost::apply_visitor(obj_processor, found_object);
 
-cout << jobj.dump(4) << '\n';
+//cout << jobj.dump(4) << '\n';
 
 cout << "Program finished.\n";
 
