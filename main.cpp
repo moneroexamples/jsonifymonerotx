@@ -29,6 +29,7 @@ auto blockchain_path = any_cast<fs::path>(options["blockchain_path"]);
 auto hash_str        = any_cast<string>(options["hash"]);
 auto sender_str      = any_cast<string>(options["sender"]);
 auto recipients_vstr = any_cast<vector<string>>(options["recipients"]);
+auto save_json       = any_cast<bool>(options["save"]);
 
 if (hash_str.empty())
 {
@@ -98,6 +99,15 @@ xmreg::FoundObjectProcessor obj_processor {
 auto jobj = boost::apply_visitor(obj_processor, found_object);
 
 cout << jobj.dump(4) << '\n'; 
+
+if (save_json)
+{
+    string out_fname = jobj["hash"].get<string>() + ".json";
+    ofstream of {out_fname};
+    of << std::setw(4) << jobj << endl;
+
+    cout << "Json file written: " + out_fname << '\n';
+}
 
 cout << "Program finished.\n";
 

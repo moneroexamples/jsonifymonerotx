@@ -20,16 +20,20 @@ process_program_options(int argc, const char *argv[])
     options["blockchain_path"] = xmreg::get_default_lmdb_folder(
                 any_cast<network_type>(options["nettype"]));
 
+    options["save"] = false;
+
     try
     {
-        po::options_description desc("jsonifymonerotx: construct complete json representaiton of monero tx or blk");
+        po::options_description desc("jsonifymonerotx: construct complete " 
+                "json representaiton of monero tx or blk");
 
         desc.add_options()
             ("help,h", "Help")
             ("hash", po::value<string>(),
              "transaction or block hash to jsonify")
             ("nettype,n", po::value<size_t>()->default_value(
-                 static_cast<size_t>(any_cast<network_type>(options["nettype"]))),
+                 static_cast<size_t>(
+                     any_cast<network_type>(options["nettype"]))),
              "network type: 0-MAINNET, 1-TESTNET, 2-STAGENET")
             ("blockchain-path,b", po::value<string>()->default_value(
                  any_cast<string>(options["blockchain_path"])),
@@ -37,7 +41,8 @@ process_program_options(int argc, const char *argv[])
             ("sender,s", po::value<string>(),
             "Optional sender's address,viewkey,spendkey")
             ("recipients,r", po::value<vector<string>>()->multitoken(),
-            "Optional sender's address,viewkey,spendkey");
+            "Optional sender's address,viewkey,spendkey")
+            ("save,w", "write json produce to a file");
 
         po::positional_options_description pos_desc;
         pos_desc.add("hash", -1);
@@ -69,6 +74,9 @@ process_program_options(int argc, const char *argv[])
 
         if (vm.count("recipients"))
             options["recipients"] = vm["recipients"].as<vector<string>>();
+
+        if (vm.count("save"))
+            options["save"] = true;
 
     }
     catch (po::error const& ex)
