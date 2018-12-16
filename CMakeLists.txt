@@ -6,10 +6,13 @@ set(PROJECT_NAME
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_BUILD_TYPE Debug)
 
 if (NOT MONERO_DIR)
     set(MONERO_DIR ~/monero)
 endif()
+
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 option(BUILD_TESTS "Build tests for the project" ON)
 

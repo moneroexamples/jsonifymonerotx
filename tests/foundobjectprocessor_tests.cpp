@@ -12,7 +12,30 @@ using namespace cryptonote;
 using namespace xmreg;
 
 
-TEST(FOUND_OBJECT_PROCESSOR, FullAddressInfo)
+class FOUND_OBJECT_TEST : public ::testing::Test
+{
+
+protected:
+
+  void SetUp() override
+  {
+      // limit monero log output
+      mlog_configure(mlog_get_default_log_path(""), true);
+      mlog_set_log("1");
+
+      blockchain_path = get_default_lmdb_folder(nt);
+      mcore = make_unique<MicroCore>(blockchain_path, nt);
+
+      jtx = construct_jsontx("d7dcb2daa64b5718dad71778112d48ad62f4d5f54337037c420cb76efdd8a21c");
+  }
+
+  unique_ptr<MicroCore> mcore;
+  network_type nt {network_type::STAGENET};
+  string blockchain_path;
+  boost::optional<JsonTx> jtx;
+};
+
+TEST(MAKE_ACCOUNT, FullAddressInfo)
 {
     auto jtx = construct_jsontx("d7dcb2daa64b5718dad71778112d48ad62f4d5f54337037c420cb76efdd8a21c");
 
@@ -30,7 +53,7 @@ TEST(FOUND_OBJECT_PROCESSOR, FullAddressInfo)
 }
 
 
-TEST(FOUND_OBJECT_PROCESSOR, IncorrectAddressInfo)
+TEST(MAKE_ACCOUNT, IncorrectAddressInfo)
 {
     auto acc_str = "some gibrish instead of correct sender info";
 
@@ -39,11 +62,8 @@ TEST(FOUND_OBJECT_PROCESSOR, IncorrectAddressInfo)
     ASSERT_FALSE(acc);
 }
 
-TEST(FOUND_OBJECT_PROCESSOR, TestSearchWithFullAccInfo)
+TEST_F(FOUND_OBJECT_TEST, TestSearchWithFullAccInfo)
 {
-    auto jtx = construct_jsontx("d7dcb2daa64b5718dad71778112d48ad62f4d5f54337037c420cb76efdd8a21c");
-
-    ASSERT_TRUE(jtx);
 
     auto const& jsender = jtx->jtx["sender"];
 
@@ -53,22 +73,16 @@ TEST(FOUND_OBJECT_PROCESSOR, TestSearchWithFullAccInfo)
 
     auto acc = make_account(acc_str);
 
-    auto mcore_mock = make_unique<MockMicroCore>();
-
     FoundObjectProcessor obj_processor {
-        std::move(mcore_mock), std::move(acc)};
+        std::move(mcore), std::move(acc)};
 
     auto jsonify_tx = obj_processor(jtx->tx);
 
     cout << jsonify_tx.dump(4) << '\n';
 }
 
-TEST(FOUND_OBJECT_PROCESSOR, TestSearchWithWithoutSpendkey)
+TEST_F(FOUND_OBJECT_TEST, TestSearchWithWithoutSpendkey)
 {
-    auto jtx = construct_jsontx("d7dcb2daa64b5718dad71778112d48ad62f4d5f54337037c420cb76efdd8a21c");
-
-    ASSERT_TRUE(jtx);
-
     auto const& jsender = jtx->jtx["sender"];
 
     auto acc_str = jsender["address"].get<string>() + ","
@@ -76,14 +90,49 @@ TEST(FOUND_OBJECT_PROCESSOR, TestSearchWithWithoutSpendkey)
 
     auto acc = make_account(acc_str);
 
-    auto mcore_mock = make_unique<MockMicroCore>();
-
     FoundObjectProcessor obj_processor {
-        std::move(mcore_mock), std::move(acc)};
+        std::move(mcore), std::move(acc)};
 
     auto jsonify_tx = obj_processor(jtx->tx);
 
     cout << jsonify_tx.dump(4) << '\n';
 }
+
+TEST_F(FOUND_OBJECT_TEST, TestSearchWithRecipients)
+{
+
+    auto const& jsender = jtx->jtx["sender"];
+
+    auto acc_str = jsender["address"].get<string>() + ","
+                  + jsender["viewkey"].get<string>() + ","
+                  + jsender["spendkey"].get<string>();
+
+    auto acc = make_account(acc_str);
+
+    vector<unique_ptr<Account>> recipients;
+
+    for (auto const& recipient: jtx->recipients)        
+    {
+
+        cout << recipient << '\n';
+
+        auto acc_str = recipient.address_str() + ","
+            + pod_to_hex(recipient.viewkey) + ","
+            + pod_to_hex(recipient.spendkey);
+
+        auto acc = make_account(acc_str);
+        
+        recipients.push_back(std::move(acc));
+    }
+
+    FoundObjectProcessor obj_processor {
+        std::move(mcore), std::move(acc), 
+            std::move(recipients)};
+
+    auto jsonify_tx = obj_processor(jtx->tx);
+
+    cout << jsonify_tx.dump(4) << '\n';
+}
+
 
 }

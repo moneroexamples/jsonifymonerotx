@@ -28,7 +28,7 @@ auto net_type        = any_cast<network_type>(options["nettype"]);
 auto blockchain_path = any_cast<fs::path>(options["blockchain_path"]);
 auto hash_str        = any_cast<string>(options["hash"]);
 auto sender_str      = any_cast<string>(options["sender"]);
-auto recipients_vstr      = any_cast<vector<string>>(options["recipients"]);
+auto recipients_vstr = any_cast<vector<string>>(options["recipients"]);
 
 if (hash_str.empty())
 {
@@ -52,7 +52,8 @@ if (!hex_to_pod(hash_str, a_hash))
 }
 
 cout << "Initializaing MicroCore\n";
-auto mcore = make_unique<xmreg::MicroCore>(blockchain_path.string(), net_type);
+auto mcore = make_unique<xmreg::MicroCore>(
+        blockchain_path.string(), net_type);
 
 auto found_object = get_tx_or_blk(*mcore, a_hash);
 
@@ -72,7 +73,6 @@ else
     cout << "Sender's info not given or incorrect. "
             "Will proceed without it." << sender_str << '\n';
 
-
 vector<unique_ptr<xmreg::Account>> recipients;
 
 if (!recipients_vstr.empty())
@@ -85,7 +85,8 @@ if (!recipients_vstr.empty())
             cout << "Recipient: " << *recpient << '\n';
         else
             cout << "Recpient's info not given or incorrect. "
-                    "Will proceed without it:" << recipient_str << '\n';
+                    "Will proceed without it: " 
+                    << recipient_str << '\n';
 
         recipients.push_back(std::move(recpient));
     }
@@ -96,7 +97,7 @@ xmreg::FoundObjectProcessor obj_processor {
 
 auto jobj = boost::apply_visitor(obj_processor, found_object);
 
-//cout << jobj.dump(4) << '\n';
+cout << jobj.dump(4) << '\n'; 
 
 cout << "Program finished.\n";
 

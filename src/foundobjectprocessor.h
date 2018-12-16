@@ -35,6 +35,16 @@ public:
     json operator()(block const& blk) const;
 
 protected:
+
+    struct block_data
+    {
+      block blk;
+      block_complete_entry comp_blk_data;
+      string comp_block_data_str;
+      uint64_t height;
+    };
+
+
     unique_ptr<MicroCore> mcore;
     unique_ptr<Account> sender;
     vector<unique_ptr<Account>> recipients;
@@ -44,6 +54,35 @@ protected:
             transaction const& tx,
             Account const& acc,
             MicroCore* mc) const;
+
+    unique_ptr<block_data>
+    get_block_data(crypto::hash const& tx_hash) const;
+
+    void
+    add_block_data(block_data const& blk_data,
+                   json& jtx) const;
+
+    void
+    add_payment_ids(identifier_t const& identifier,
+                    json& jtx) const;
+
+    void
+    add_outputs_data(transaction const& tx, json& jtx) const;
+
+    void
+    add_inputs_data(transaction const& tx, json& jtx) const;
+
+    void
+    add_basic_acc_data(Account& acc, json& jtx) const;
+
+    uint64_t
+    decode_outputs(identifier_t const& identifier,
+                   json& jtx) const;
+
+    uint64_t
+    decode_inputs(identifier_t const& identifier,
+                  json& jtx) const;
+
 };
 
 }

@@ -15,7 +15,7 @@ process_program_options(int argc, const char *argv[])
     options["nettype"] = network_type::STAGENET;
     options["hash"] = ""s;
     options["sender"] = ""s;
-    options["respients"] = vector<string>{};
+    options["recipients"] = vector<string>{};
 
     options["blockchain_path"] = xmreg::get_default_lmdb_folder(
                 any_cast<network_type>(options["nettype"]));
@@ -35,9 +35,9 @@ process_program_options(int argc, const char *argv[])
                  any_cast<string>(options["blockchain_path"])),
              "Path to lmdb folder containing the blockchain")
             ("sender,s", po::value<string>(),
-            "Optinal sender's address,viewkey,spendkey")
+            "Optional sender's address,viewkey,spendkey")
             ("recipients,r", po::value<vector<string>>()->multitoken(),
-            "Optinal sender's address,viewkey,spendkey");
+            "Optional sender's address,viewkey,spendkey");
 
         po::positional_options_description pos_desc;
         pos_desc.add("hash", -1);
