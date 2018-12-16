@@ -6,28 +6,13 @@ for generating transaction and block json representations for unit tests.
 
 ## Example compilation on Ubuntu 18.04
 
-C++14 is required to run this code.
+C++14 is required to compile this code.
 
 #### Monero download and compilation
 
-Download and compile recent Monero into your home folder:
+Follow instructions in the following link:
 
-```bash
-# first install monero dependecines
-sudo apt update
-
-sudo apt install git build-essential cmake libboost-all-dev miniupnpc libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev libcurl4-openssl-dev libgtest-dev libreadline-dev libzmq3-dev libsodium-dev libhidapi-dev libhidapi-libusb0
-
-# go to home folder
-cd ~
-
-git clone --recurse-submodules https://github.com/monero-project/monero
-
-cd monero/
-
-USE_SINGLE_BUILDDIR=1 make
-```
-
+https://github.com/moneroexamples/monero-compilation/blob/master/README.md
 
 #### Compilation of the xmregcore
 
@@ -48,8 +33,16 @@ cmake ..
 # if monero is not in ~/monero
 
 make
-
 ```
+
+#### Example executions
+
+For stagenet:
+
+```bash
+./jsonifyxmrtx 233281d06f745ff79213765112e0b4e34f9f833b151b846e6efcd202cf74d5e7 -s 57Hx8QpLUSMjhgoCNkvJ2Ch91mVyxcffESCprnRPrtbphMCv8iGUEfCUJxrpUWUeWrS9vPWnFrnMmTwnFpSKJrSKNuaXc5q,9595c2445cdd4c88d78f0af41ebdf52f68ae2e3597b9e7b99bc3d62e300df806,6fe76a5e4657695cbcc09fab93b70ac974c76e0f02afde71cb460423d1444b03 -r 78tUApnibpS26vFVpzvMN9VKgPaw2EUgU7ViswvKTfy1XJ4NhM6NQcZL6TUWm81sX7bgJJxLYe2MxDx4MLfYRLZJPAMMnon,b45e6f38b2cd1c667459527decb438cdeadf9c64d93c8bccf40a9bf98943dc09 78tUApnibpS26vFVpzvMN9VKgPaw2EUgU7ViswvKTfy1XJ4NhM6NQcZL6TUWm81sX7bgJJxLYe2MxDx4MLfYRLZJPAMMnon,b45e6f38b2cd1c667459527decb438cdeadf9c64d93c8bccf40a9bf98943dc09 55ZbQdMnZHPFS8pmrhHN5jMpgJwnnTXpTDmmM5wkrBBx4xD6aEnpZq7dPkeDeWs67TV9HunDQtT3qF2UGYWzGGxq3zYWCBE,c8a4d62e3c86de907bd84463f194505ab07fc231b3da753342d93fccb5d39203
+```
+
 
 ## Other examples
 
