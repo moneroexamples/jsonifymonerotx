@@ -21,6 +21,7 @@ process_program_options(int argc, const char *argv[])
                 any_cast<network_type>(options["nettype"]));
 
     options["save"] = false;
+    options["display"] = true;
 
     try
     {
@@ -42,7 +43,8 @@ process_program_options(int argc, const char *argv[])
             "Optional sender's address,viewkey,spendkey")
             ("recipients,r", po::value<vector<string>>()->multitoken(),
             "Optional sender's address,viewkey,spendkey")
-            ("save,w", "write json produce to a file");
+            ("save,w", "write json produced to a file")
+            ("display,d", "do not display json produced");
 
         po::positional_options_description pos_desc;
         pos_desc.add("hash", -1);
@@ -77,6 +79,9 @@ process_program_options(int argc, const char *argv[])
 
         if (vm.count("save"))
             options["save"] = true;
+        
+        if (vm.count("display"))
+            options["display"] = false;
 
     }
     catch (po::error const& ex)
@@ -151,7 +156,7 @@ make_account(string const& account_info,
             return account_factory(splitted[0]);
         }
     }
-    catch (std::runtime_error const& e)
+    catch (std::exception const& e)
     {
         cerr << e.what() << '\n';
     }

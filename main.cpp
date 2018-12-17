@@ -30,6 +30,7 @@ auto hash_str        = any_cast<string>(options["hash"]);
 auto sender_str      = any_cast<string>(options["sender"]);
 auto recipients_vstr = any_cast<vector<string>>(options["recipients"]);
 auto save_json       = any_cast<bool>(options["save"]);
+auto no_display_json = any_cast<bool>(options["display"]);
 
 if (hash_str.empty())
 {
@@ -85,9 +86,12 @@ if (!recipients_vstr.empty())
         if (recpient)
             cout << "Recipient: " << *recpient << '\n';
         else
+        {
             cout << "Recpient's info not given or incorrect. "
                     "Will proceed without it: " 
                     << recipient_str << '\n';
+            continue;
+        }
 
         recipients.push_back(std::move(recpient));
     }
@@ -98,15 +102,24 @@ xmreg::FoundObjectProcessor obj_processor {
 
 auto jobj = boost::apply_visitor(obj_processor, found_object);
 
-cout << jobj.dump(4) << '\n'; 
+
+if (no_display_json)
+{
+    cout << jobj.dump(4) << '\n'; 
+}
 
 if (save_json)
 {
-    string out_fname = jobj["hash"].get<string>() + ".json";
-    ofstream of {out_fname};
+    auto cwd = fs::current_path();
+
+    auto out_fname = cwd 
+        / fs::path {jobj["hash"].get<string>() + ".json"};
+    
+    ofstream of {out_fname.string()};
+    
     of << std::setw(4) << jobj << endl;
 
-    cout << "Json file written: " + out_fname << '\n';
+    cout << "\nJson file written: " << out_fname << '\n';
 }
 
 cout << "Program finished.\n";
