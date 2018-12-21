@@ -460,6 +460,9 @@ FoundObjectProcessor::add_inputs_data(
                    json {
                           {"ouput_pk", pod_to_hex(mo.pubkey)},
                           {"tx_hash", pod_to_hex(mixin_tx_hash)},
+                          {"unlock_time", mo.unlock_time},
+                          {"height", mo.height},
+                          {"commitment", pod_to_hex(mo.commitment)},
                           {"output_index_in_tx", txi.second},
                           {"tx_hex", tx_hex},
                    });
