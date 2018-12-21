@@ -190,7 +190,10 @@ public:
                   public_key const& tx_pub_key,
                   vector<public_key> const& additional_tx_pub_keys
                   = vector<public_key>{}) override
-    {};
+    {
+        cout << "EmptyRealInput\n";
+    };
+
 };
 
 FoundObjectProcessor::identifier_t
@@ -502,7 +505,7 @@ FoundObjectProcessor::decode_outputs(
         total += output.amount;
     } 
 
-    jtx["total_amount"] = total;
+    jtx["total_recieved"] = total;
 
     return total;
 }
@@ -529,7 +532,7 @@ FoundObjectProcessor::decode_inputs(identifier_t const& identifier,
         total += input.amount;
     }
     
-    jtx["total_amount"] = total;
+    jtx["total_spent"] = total;
 
     return total;
 }
