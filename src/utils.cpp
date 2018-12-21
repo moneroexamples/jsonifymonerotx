@@ -42,7 +42,7 @@ process_program_options(int argc, const char *argv[])
             ("sender,s", po::value<string>(),
             "Optional sender's address,viewkey,spendkey")
             ("recipients,r", po::value<vector<string>>()->multitoken(),
-            "Optional sender's address,viewkey,spendkey")
+            "Optional recipients' address,viewkey,spendkey")
             ("save,w", "write json produced to a file")
             ("display,d", "do not display json produced");
 
