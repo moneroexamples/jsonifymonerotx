@@ -67,6 +67,16 @@ process_program_options(int argc, const char *argv[])
         if (vm.count("blockchain-path"))
             options["blockchain_path"]
                     = fs::path {vm["blockchain-path"].as<string>()};
+        
+        if (vm.count("nettype"))
+        {
+            options["nettype"] 
+                = static_cast<network_type>(vm["nettype"].as<size_t>());
+    
+            options["blockchain_path"] = fs::path {
+                xmreg::get_default_lmdb_folder(
+                    any_cast<network_type>(options["nettype"]))};
+        }
 
         if (vm.count("hash"))
             options["hash"] = vm["hash"].as<string>();
