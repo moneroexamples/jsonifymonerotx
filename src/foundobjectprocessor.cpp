@@ -41,8 +41,6 @@ FoundObjectProcessor::operator()(boost::blank) const
 json
 FoundObjectProcessor::operator()(transaction const& tx) const
 {
-    cout << "Save tx into json\n";
-
     json jtx;
 
     string tx_hex;
@@ -56,21 +54,22 @@ FoundObjectProcessor::operator()(transaction const& tx) const
         cerr << e.what() << endl;
         return json {"error", "Failed to obtain hex of tx"};
     }
+    
+    add_basic_data(jtx);
 
     crypto::hash tx_hash = get_transaction_hash(tx);
 
-    jtx["hash"] = pod_to_hex(tx_hash);
-    jtx["hex"]  = tx_hex;
-    jtx["nettype"] = static_cast<size_t>(mcore->get_nettype());
+    jtx["tx_hash"] = pod_to_hex(tx_hash);
+    jtx["tx_hex"]  = tx_hex;
     jtx["is_ringct"] = (tx.version > 1);
     jtx["rct_type"] = tx.rct_signatures.type;
 
-    jtx["_comment"] = "Just a placeholder for some comment if needed later";
+    jtx["is_coinbase"] = is_coinbase(tx);
 
     auto blk_data = get_block_data(tx_hash);
 
     if (!blk_data)
-        return {};
+        return jtx;
 
     add_block_data(*blk_data, jtx);
 
@@ -123,16 +122,54 @@ FoundObjectProcessor::operator()(transaction const& tx) const
         }
     }
 
-
     return jtx;
 }
 
 json
 FoundObjectProcessor::operator()(block const& blk) const
 {
-    cout << "Save block into json\n";
-
     json jblk;
+
+    block_data blk_data {};
+
+    blk_data.blk = blk;
+
+    crypto::hash blk_hash = get_block_hash(blk);
+    
+    jblk["blk_hex"]  = pod_to_hex(blk_hash);
+
+    blk_data.height = mcore->get_core()
+        .get_db().get_block_height(blk_hash);
+  
+    auto blk_comp_data = get_block_complete_data(blk);
+
+    if (!blk_comp_data)
+      return jblk;
+
+    blk_data.comp_blk_data = blk_comp_data->first;
+    blk_data.comp_block_data_str = blk_comp_data->second;
+    
+    add_block_data(blk_data, jblk);
+
+    jblk["transactions"] = json::array();
+
+    auto& txs = jblk["transactions"];
+
+    txs.push_back(this->operator()(blk.miner_tx));
+
+    for (auto const& tx_hash: blk.tx_hashes)
+    {
+        transaction tx;
+
+        if (!mcore->get_tx(tx_hash, tx))
+        {
+            cerr << "Error getting tx of hash: " 
+                 << pod_to_hex(tx_hash) << '\n';
+            return jblk;
+        }
+
+        txs.push_back(this->operator()(blk.miner_tx));
+    }
 
     return jblk;
 }
@@ -209,23 +246,49 @@ FoundObjectProcessor::get_block_data(
       return nullptr;
   }
 
-  if (!mcore->get_block_complete_entry(blk_data->blk, 
-              blk_data->comp_blk_data))
+  auto blk_comp_data = get_block_complete_data(blk_data->blk);
+
+  if (!blk_comp_data)
+      return nullptr;
+
+  blk_data->comp_blk_data = blk_comp_data->first;
+  blk_data->comp_block_data_str = blk_comp_data->second;
+
+  return blk_data;
+}
+
+unique_ptr<pair<block_complete_entry, string>>
+FoundObjectProcessor::get_block_complete_data(
+        block const& blk) const
+{
+
+  auto blk_comp_data 
+      = make_unique<pair<block_complete_entry, string>>();
+
+  if (!mcore->get_block_complete_entry(blk, 
+              blk_comp_data->first))
   {
       cerr << "Failed to obtain complete block data \n";
       return nullptr;
   }
 
   if(!epee::serialization::store_t_to_binary(
-              blk_data->comp_blk_data, blk_data->comp_block_data_str))
+              blk_comp_data->first, 
+              blk_comp_data->second))
   {
       cerr << "Failed to serialize complete_block_data\n";
       return nullptr;
   }
 
-  return blk_data;
+  return blk_comp_data;
 }
 
+void
+FoundObjectProcessor::add_basic_data(json& jtx) const
+{
+    jtx["nettype"] = static_cast<size_t>(mcore->get_nettype());
+    jtx["_comment"] = "Just a placeholder for some comment if needed later";
+}
 
 void
 FoundObjectProcessor::add_block_data(
@@ -237,6 +300,8 @@ FoundObjectProcessor::add_block_data(
 
     jtx["block_version"] = json {blk_data.blk.major_version,
                                  blk_data.blk.minor_version};
+
+    jtx["block_height"] = blk_data.height;
 }
 
 void
@@ -410,8 +475,7 @@ FoundObjectProcessor::add_basic_acc_data(
         {"viewkey", acc.vk2str()},
         {"spendkey", acc.sk2str()},
         {"is_subaddress", acc.is_subaddress()},
-        {"outputs", json::array()},
-        {"inputs", json::array()}
+        {"outputs", json::array()}
     };
 }
 
@@ -446,6 +510,8 @@ FoundObjectProcessor::decode_inputs(identifier_t const& identifier,
               json& jtx) const
 {
     uint64_t total {0};
+
+    jtx["inputs"] = json::array();
 
     auto& jinputs = jtx["inputs"];
 

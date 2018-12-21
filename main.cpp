@@ -45,19 +45,72 @@ cout << "Blockchain path: " << blockchain_path << '\n';
 mlog_configure(mlog_get_default_log_path(""), true);
 mlog_set_log("1");
 
-crypto::hash a_hash;
+unique_ptr<uint64_t> blk_height;
+unique_ptr<crypto::hash> a_hash;
 
-if (!hex_to_pod(hash_str, a_hash))
+if (hash_str.length() != 64)
 {
-    cerr << "Failed to convert "<< hash_str << " to crypto::hash\n";
-    return EXIT_SUCCESS;
+    // seems we dont have hash. maybe its 
+    // a block height. 
+    try
+    {
+        blk_height = make_unique<uint64_t>(
+                boost::lexical_cast<uint64_t>(hash_str));
+    }
+    catch (boost::bad_lexical_cast const& e)
+    {
+        cerr << "Cant convert " << hash_str
+             << " into uint64_t\n";
+        return EXIT_SUCCESS;
+    }
+
 }
+else
+{
+    // seems we have a hash. so try to decode it
+    //
+    a_hash = make_unique<crypto::hash>();
+     
+    if (!hex_to_pod(hash_str, *a_hash))
+    {
+        cerr << "Failed to convert "<< hash_str << " to crypto::hash\n";
+        return EXIT_SUCCESS;
+    }
+}
+
 
 cout << "Initializaing MicroCore\n";
 auto mcore = make_unique<xmreg::MicroCore>(
         blockchain_path.string(), net_type);
 
-auto found_object = get_tx_or_blk(*mcore, a_hash);
+if (blk_height)    
+{
+    auto current_height =  mcore->get_core().get_current_blockchain_height();
+
+    if (*blk_height > current_height)
+    {
+        cerr << "Requested block height " << *blk_height 
+            <<  "is greater than current height " 
+            << current_height << '\n';
+        return EXIT_SUCCESS;
+    }
+
+    try
+    {
+        a_hash = make_unique<crypto::hash>(mcore->get_core()
+            .get_db().get_block_hash_from_height(*blk_height));
+    }
+    catch (std::exception const& e)
+    {
+        cerr << "Failed to get hash of block " << *blk_height << '\n';
+        return EXIT_SUCCESS;
+    }
+
+    cout << "Found hash for block: " << *blk_height
+         << ", " << pod_to_hex(*a_hash) << '\n';
+}
+
+auto found_object = get_tx_or_blk(*mcore, *a_hash);
 
 if (!found_object.which())
 {

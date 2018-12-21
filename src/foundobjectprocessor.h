@@ -55,8 +55,15 @@ protected:
             Account const& acc,
             MicroCore* mc) const;
 
+    void
+    add_basic_data(json& jtx) const;
+
     unique_ptr<block_data>
     get_block_data(crypto::hash const& tx_hash) const;
+    
+
+    unique_ptr<pair<block_complete_entry, string>>
+    get_block_complete_data(block const& blk) const;
 
     void
     add_block_data(block_data const& blk_data,
