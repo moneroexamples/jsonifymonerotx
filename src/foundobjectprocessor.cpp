@@ -62,6 +62,7 @@ FoundObjectProcessor::operator()(transaction const& tx) const
     jtx["type"] = "transaction"s;
     jtx["tx_hash"] = pod_to_hex(tx_hash);
     jtx["tx_hex"]  = tx_hex;
+    jtx["fee"] = get_tx_fee(tx);
     jtx["is_ringct"] = (tx.version > 1);
     jtx["rct_type"] = tx.rct_signatures.type;
 
