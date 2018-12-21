@@ -138,7 +138,7 @@ FoundObjectProcessor::operator()(block const& blk) const
     crypto::hash blk_hash = get_block_hash(blk);
     
     jblk["type"] = "block"s;
-    jblk["blk_hex"]  = pod_to_hex(blk_hash);
+    jblk["blk_hash"]  = pod_to_hex(blk_hash);
 
     blk_data.height = mcore->get_core()
         .get_db().get_block_height(blk_hash);
@@ -170,7 +170,7 @@ FoundObjectProcessor::operator()(block const& blk) const
             return jblk;
         }
 
-        txs.push_back(this->operator()(blk.miner_tx));
+        txs.push_back(this->operator()(tx));
     }
 
     return jblk;
