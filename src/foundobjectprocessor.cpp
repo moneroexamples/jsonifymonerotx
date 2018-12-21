@@ -191,7 +191,7 @@ public:
                   vector<public_key> const& additional_tx_pub_keys
                   = vector<public_key>{}) override
     {
-        cout << "EmptyRealInput\n";
+        //cout << "EmptyRealInput\n";
     };
 
 };
