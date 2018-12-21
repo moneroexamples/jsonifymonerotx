@@ -165,8 +165,17 @@ if (save_json)
 {
     auto cwd = fs::current_path();
 
-    auto out_fname = cwd 
-        / fs::path {jobj["hash"].get<string>() + ".json"};
+    fs::path out_fname {cwd};
+
+    if (jobj["type"] == "transaction"s)
+        out_fname /= fs::path {
+            "tx_"s + jobj["tx_hash"].get<string>() 
+                + ".json"};
+    else
+        out_fname /= fs::path {
+            "blk_"s + 
+            std::to_string(jobj["height"].get<uint64_t>()) 
+                + ".json"};
     
     ofstream of {out_fname.string()};
     

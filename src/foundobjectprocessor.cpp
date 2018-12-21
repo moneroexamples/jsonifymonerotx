@@ -58,7 +58,8 @@ FoundObjectProcessor::operator()(transaction const& tx) const
     add_basic_data(jtx);
 
     crypto::hash tx_hash = get_transaction_hash(tx);
-
+    
+    jtx["type"] = "transaction"s;
     jtx["tx_hash"] = pod_to_hex(tx_hash);
     jtx["tx_hex"]  = tx_hex;
     jtx["is_ringct"] = (tx.version > 1);
@@ -136,11 +137,12 @@ FoundObjectProcessor::operator()(block const& blk) const
 
     crypto::hash blk_hash = get_block_hash(blk);
     
+    jblk["type"] = "block"s;
     jblk["blk_hex"]  = pod_to_hex(blk_hash);
 
     blk_data.height = mcore->get_core()
         .get_db().get_block_height(blk_hash);
-  
+
     auto blk_comp_data = get_block_complete_data(blk);
 
     if (!blk_comp_data)
@@ -301,7 +303,7 @@ FoundObjectProcessor::add_block_data(
     jtx["block_version"] = json {blk_data.blk.major_version,
                                  blk_data.blk.minor_version};
 
-    jtx["block_height"] = blk_data.height;
+    jtx["height"] = blk_data.height;
 }
 
 void
