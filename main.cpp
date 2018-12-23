@@ -28,8 +28,10 @@ auto net_type        = any_cast<network_type>(options["nettype"]);
 auto blockchain_path = any_cast<fs::path>(options["blockchain_path"]);
 auto hash_str        = any_cast<string>(options["hash"]);
 auto sender_str      = any_cast<string>(options["sender"]);
+auto message_str     = any_cast<string>(options["message"]);
 auto recipients_vstr = any_cast<vector<string>>(options["recipients"]);
 auto save_json       = any_cast<bool>(options["save"]);
+auto save_command    = any_cast<bool>(options["command"]);
 auto no_display_json = any_cast<bool>(options["display"]);
 
 if (hash_str.empty())
@@ -155,6 +157,16 @@ xmreg::FoundObjectProcessor obj_processor {
 
 auto jobj = boost::apply_visitor(obj_processor, found_object);
 
+if (save_command)
+{
+    jobj["generated_using"] 
+        = any_cast<string>(options["generated_using"]);
+}
+
+if (!message_str.empty())
+{
+    jobj["_comment"] = message_str;
+}
 
 if (no_display_json)
 {

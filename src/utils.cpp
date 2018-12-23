@@ -22,6 +22,9 @@ process_program_options(int argc, const char *argv[])
 
     options["save"] = false;
     options["display"] = true;
+    options["command"] = false;
+    
+    options["message"] = ""s;
 
     try
     {
@@ -41,9 +44,12 @@ process_program_options(int argc, const char *argv[])
              "Path to lmdb folder containing the blockchain")
             ("sender,s", po::value<string>(),
             "Optional sender's address,viewkey,spendkey")
+            ("message,m", po::value<string>(),
+            "Optional message to be saved in the json file")
             ("recipients,r", po::value<vector<string>>()->multitoken(),
             "Optional recipients' address,viewkey,spendkey")
             ("save,w", "write json produced to a file")
+            ("command,c", "save command used to generate the json file")
             ("display,d", "do not display json produced");
 
         po::positional_options_description pos_desc;
@@ -52,6 +58,7 @@ process_program_options(int argc, const char *argv[])
         po::command_line_parser parser{argc, argv};
         parser.options(desc).positional(pos_desc).allow_unregistered();
         po::parsed_options parsed_options = parser.run();
+
 
         po::variables_map vm;
         store(parsed_options, vm);
@@ -64,10 +71,6 @@ process_program_options(int argc, const char *argv[])
             return options;
         }
 
-        if (vm.count("blockchain-path"))
-            options["blockchain_path"]
-                    = fs::path {vm["blockchain-path"].as<string>()};
-        
         if (vm.count("nettype"))
         {
             options["nettype"] 
@@ -78,17 +81,27 @@ process_program_options(int argc, const char *argv[])
                     any_cast<network_type>(options["nettype"]))};
         }
 
+        if (vm.count("blockchain-path"))
+            options["blockchain_path"]
+                    = fs::path {vm["blockchain-path"].as<string>()};
+
         if (vm.count("hash"))
             options["hash"] = vm["hash"].as<string>();
 
         if (vm.count("sender"))
             options["sender"] = vm["sender"].as<string>();
+        
+        if (vm.count("message"))
+            options["message"] = vm["message"].as<string>();
 
         if (vm.count("recipients"))
             options["recipients"] = vm["recipients"].as<vector<string>>();
 
         if (vm.count("save"))
             options["save"] = true;
+        
+        if (vm.count("command"))
+            options["command"] = true;
         
         if (vm.count("display"))
             options["display"] = false;
@@ -98,6 +111,16 @@ process_program_options(int argc, const char *argv[])
     {
         cerr << ex.what() << '\n';
     }
+
+    string options_passed;
+
+    for (size_t i = 0; i < argc; i++)
+        options_passed += argv[i] +  " "s;
+
+    options_passed.pop_back();
+
+    cout << options_passed << '\n';
+    options["generated_using"] = options_passed;
 
     return options;
 }

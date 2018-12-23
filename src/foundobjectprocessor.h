@@ -56,6 +56,10 @@ protected:
             MicroCore* mc) const;
 
     void
+    add_legacy_payment_id(transaction const& tx,
+                          json& jtx) const;
+
+    void
     add_basic_data(json& jtx) const;
 
     unique_ptr<block_data>

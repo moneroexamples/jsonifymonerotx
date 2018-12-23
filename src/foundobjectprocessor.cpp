@@ -79,6 +79,8 @@ FoundObjectProcessor::operator()(transaction const& tx) const
 
     add_inputs_data(tx, jtx);
 
+    add_legacy_payment_id(tx, jtx);
+
     // add decoded outputs and inputs for the sender
     
     if (sender)
@@ -93,7 +95,7 @@ FoundObjectProcessor::operator()(transaction const& tx) const
                 tx, *sender, mcore.get());
         identifier.identify();
 
-        add_payment_ids(identifier, jtx);
+        add_payment_ids(identifier, jtx);        
 
         decode_outputs(identifier, jsender);
 
@@ -119,6 +121,14 @@ FoundObjectProcessor::operator()(transaction const& tx) const
             auto identifier = construct_identifier(
                     tx, *recpient, mcore.get());
             identifier.identify();
+        
+            // for integrated payment ids this will overwrite what
+            // ever was set when processing sender. 
+            // the reason is that recipient identifier is requred 
+            // to properly decode encrypted payment id.
+            // we have encrypted payment ids only when there is one recipient
+            if (recipients.size() == 1)
+                add_payment_ids(identifier, jtx);
 
             decode_outputs(identifier, jrecipient);
         }
@@ -228,6 +238,23 @@ FoundObjectProcessor::construct_identifier(
 }
 
 
+void
+FoundObjectProcessor::add_legacy_payment_id(
+        transaction const& tx,
+        json& jtx) const
+{
+    LegacyPaymentID legacy_payment_id_identifier {nullptr, nullptr};
+
+    legacy_payment_id_identifier.identify(tx, public_key{});
+
+    auto legacy_payment_id = legacy_payment_id_identifier.get();
+
+    if (legacy_payment_id != crypto::null_hash)
+    {
+        jtx["payment_id"] = pod_to_hex(legacy_payment_id);
+    }
+}
+
 unique_ptr<FoundObjectProcessor::block_data>
 FoundObjectProcessor::get_block_data(
     crypto::hash const& tx_hash) const
@@ -315,32 +342,22 @@ FoundObjectProcessor::add_payment_ids(
         identifier_t const& identifier,
         json& jtx) const
 {
-    jtx["payment_id"] = string(64, '0');
     jtx["payment_id8"] = string(16, '0');
     jtx["payment_id8e"] = string(16, '0');
 
-    crypto::hash legacy_payment_id
-            = identifier.get<LegacyPaymentID>()->get();
+    // if the tx don't have legacy payment id, it might have
+    // integrated id, so we check for it here
 
-    if (legacy_payment_id != crypto::null_hash)
-    {
-        jtx["payment_id"] = pod_to_hex(legacy_payment_id);
-    }
-    else
-    {
-        // if the tx don't have legacy payment id, it might have
-        // integrated id, so we check for it here
+    jtx["payment_id8"] = pod_to_hex(identifier
+                                    .get<IntegratedPaymentID>()
+                                    ->raw());
 
-        jtx["payment_id8"] = pod_to_hex(identifier
-                                        .get<IntegratedPaymentID>()
-                                        ->raw());
+    crypto::hash8 integrated_payment_id
+            = identifier.get<IntegratedPaymentID>()->get();
 
-        crypto::hash8 integrated_payment_id
-                = identifier.get<IntegratedPaymentID>()->get();
+    if (integrated_payment_id != crypto::null_hash8)
+        jtx["payment_id8e"] = pod_to_hex(integrated_payment_id);
 
-        if (integrated_payment_id != crypto::null_hash8)
-            jtx["payment_id8e"] = pod_to_hex(integrated_payment_id);
-    }
 }
 
 void
