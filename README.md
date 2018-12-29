@@ -14,7 +14,7 @@ Follow instructions in the following link:
 
 https://github.com/moneroexamples/monero-compilation/blob/master/README.md
 
-#### Compilation of the xmregcore
+#### Compilation of the jsonifymonerotx
 
 ```bash
 
