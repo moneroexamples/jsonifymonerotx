@@ -26,6 +26,8 @@ process_program_options(int argc, const char *argv[])
     
     options["message"] = ""s;
 
+    options["txprvkey"] = ""s;
+
     try
     {
         po::options_description desc("jsonifymonerotx: construct complete " 
@@ -46,6 +48,8 @@ process_program_options(int argc, const char *argv[])
             "Optional sender's address,viewkey,spendkey")
             ("message,m", po::value<string>(),
             "Optional message to be saved in the json file")
+            ("txprvkey,t", po::value<string>(),
+            "transaction private key")
             ("recipients,r", po::value<vector<string>>()->multitoken(),
             "Optional recipients' address,viewkey,spendkey")
             ("save,w", "write json produced to a file")
@@ -94,6 +98,9 @@ process_program_options(int argc, const char *argv[])
         if (vm.count("message"))
             options["message"] = vm["message"].as<string>();
 
+        if (vm.count("txprvkey"))
+            options["txprvkey"] = vm["txprvkey"].as<string>();
+
         if (vm.count("recipients"))
             options["recipients"] = vm["recipients"].as<vector<string>>();
 
@@ -114,7 +121,7 @@ process_program_options(int argc, const char *argv[])
 
     string options_passed;
 
-    for (size_t i = 0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         options_passed += argv[i] +  " "s;
 
     options_passed.pop_back();

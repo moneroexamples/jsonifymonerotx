@@ -29,6 +29,7 @@ auto blockchain_path = any_cast<fs::path>(options["blockchain_path"]);
 auto hash_str        = any_cast<string>(options["hash"]);
 auto sender_str      = any_cast<string>(options["sender"]);
 auto message_str     = any_cast<string>(options["message"]);
+auto txprvkey_str    = any_cast<string>(options["txprvkey"]);
 auto recipients_vstr = any_cast<vector<string>>(options["recipients"]);
 auto save_json       = any_cast<bool>(options["save"]);
 auto save_command    = any_cast<bool>(options["command"]);
@@ -157,6 +158,22 @@ xmreg::FoundObjectProcessor obj_processor {
 
 auto jobj = boost::apply_visitor(obj_processor, found_object);
 
+if (!txprvkey_str.empty())
+{
+    // before we store tx private key,
+    // just check if it is valid
+    crypto::secret_key tx_prv_key;
+
+    if (!hex_to_pod(txprvkey_str, tx_prv_key))
+    {
+        cerr << "Tx private key '"
+             << txprvkey_str <<"' has wrong format\n";
+        return EXIT_SUCCESS;
+    }
+
+    jobj["tx_prv_key"] = txprvkey_str;
+}
+
 if (save_command)
 {
     jobj["generated_using"] 
@@ -172,6 +189,8 @@ if (no_display_json)
 {
     cout << jobj.dump(4) << '\n'; 
 }
+
+
 
 if (save_json)
 {
