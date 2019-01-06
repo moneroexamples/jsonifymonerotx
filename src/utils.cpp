@@ -43,15 +43,15 @@ process_program_options(int argc, const char *argv[])
              "network type: 0-MAINNET, 1-TESTNET, 2-STAGENET")
             ("blockchain-path,b", po::value<string>()->default_value(
                  any_cast<string>(options["blockchain_path"])),
-             "Path to lmdb folder containing the blockchain")
+             "path to lmdb folder containing the blockchain")
             ("sender,s", po::value<string>(),
-            "Optional sender's address,viewkey,spendkey")
+            "optional sender's address,viewkey,spendkey")
             ("message,m", po::value<string>(),
-            "Optional message to be saved in the json file")
+            "optional message to be saved in the json file")
             ("txprvkey,t", po::value<string>(),
             "transaction private key")
             ("recipients,r", po::value<vector<string>>()->multitoken(),
-            "Optional recipients' address,viewkey,spendkey")
+            "optional recipients' address,viewkey,spendkey")
             ("save,w", "write json produced to a file")
             ("command,c", "save command used to generate the json file")
             ("display,d", "do not display json produced");
