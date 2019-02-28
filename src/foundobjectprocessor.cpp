@@ -3,7 +3,7 @@
 namespace xmreg
 {
 
-inline string
+string
 tx_to_hex(transaction const& tx)
 {
     return epee::string_tools
@@ -344,6 +344,7 @@ FoundObjectProcessor::add_payment_ids(
 {
     jtx["payment_id8"] = string(16, '0');
     jtx["payment_id8e"] = string(16, '0');
+    jtx["is_payment_id8_real"] = false;
 
     // if the tx don't have legacy payment id, it might have
     // integrated id, so we check for it here
@@ -356,7 +357,10 @@ FoundObjectProcessor::add_payment_ids(
             = identifier.get<IntegratedPaymentID>()->get();
 
     if (integrated_payment_id != crypto::null_hash8)
+    {
         jtx["payment_id8e"] = pod_to_hex(integrated_payment_id);
+        jtx["is_payment_id8_real"] = true;
+    }
 
 }
 
