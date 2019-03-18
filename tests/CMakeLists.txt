@@ -9,12 +9,7 @@ macro(add_om_test _TEST_NAME)
     target_link_libraries(${_TEST_NAME}_tests
             gtest gtest_main
             gmock gmock_main
-            ${LIBRARIES})
-
-    target_include_monero_directories(${_TEST_NAME}_tests)
-
-    target_include_directories(${_TEST_NAME}_tests
-        PRIVATE ../src/xmregcore)
+            XMREG::core)
 
     add_test(NAME ${_TEST_NAME}_tests COMMAND ${_TEST_NAME}_tests)
 
