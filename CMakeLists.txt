@@ -9,7 +9,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Debug)
 
 list(APPEND CMAKE_MODULE_PATH 
-    "${CMAKE_CURRENT_LIST_DIR}/src/xmregcore/cmake")
+    "${CMAKE_CURRENT_LIST_DIR}/src/xmregcore/cmake"
+    "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 include(MyUtils)
 
@@ -47,6 +48,7 @@ if (${BUILD_TESTS})
 endif()
 
 if (${BUILD_TESTS})
+
     enable_testing()
     add_subdirectory(ext/googletest)
     add_subdirectory(tests)
