@@ -27,19 +27,8 @@ set(SOURCE_FILES
 add_executable(${PROJECT_NAME}
         ${SOURCE_FILES})
 
-#target_include_directories(${PROJECT_NAME}
-    #PRIVATE
-    #src/xmregcore)
-
 target_link_libraries(${PROJECT_NAME}
     PRIVATE XMREG::core)
-
-
-#message("Project source dir ${PROJECT_SOURCE_DIR}")
-
-#target_include_directories(fmt-header-only INTERFACE
-      #$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
-
 
 if (${BUILD_TESTS})
     include_directories(
@@ -48,7 +37,6 @@ if (${BUILD_TESTS})
 endif()
 
 if (${BUILD_TESTS})
-
     enable_testing()
     add_subdirectory(ext/googletest)
     add_subdirectory(tests)
