@@ -117,6 +117,7 @@ process_program_options(int argc, const char *argv[])
     catch (po::error const& ex)
     {
         cerr << ex.what() << '\n';
+        options["error"] = true;
     }
 
     string options_passed;
