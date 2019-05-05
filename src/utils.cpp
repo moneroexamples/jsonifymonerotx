@@ -169,7 +169,7 @@ get_tx_or_blk(MicroCore const& mcore, crypto::hash const& a_hash)
 }
 
 unique_ptr<Account>
-make_account(string const& account_info,           
+parse_account(string const& account_info,           
              string const& split_by)
 {
    unique_ptr<Account> acc;
@@ -190,11 +190,11 @@ make_account(string const& account_info,
         switch(splitted.size())
         {
         case 3:            
-            return account_factory(splitted[0], splitted[1], splitted[2]);
+            return make_account(splitted[0], splitted[1], splitted[2]);
         case 2:
-            return account_factory(splitted[0], splitted[1]);
+            return make_account(splitted[0], splitted[1]);
         case 1:
-            return account_factory(splitted[0]);
+            return make_account(splitted[0]);
         }
     }
     catch (std::exception const& e)

@@ -123,7 +123,7 @@ if (!found_object.which())
     return EXIT_SUCCESS;
 }
 
-auto sender = xmreg::make_account(sender_str);
+auto sender = xmreg::parse_account(sender_str);
 
 if (sender)
     cout << "Sender: " << *sender << '\n';

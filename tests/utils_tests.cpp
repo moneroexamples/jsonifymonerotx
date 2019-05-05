@@ -24,7 +24,7 @@ TEST(MAKE_ACCOUNT, AddressViewkeySpendky)
 {
     string const input = address + ',' + viewkey + ',' + spendkey;
 
-    auto account = make_account(input);
+    auto account = parse_account(input);
 
     EXPECT_TRUE(account);
     EXPECT_EQ(account->ai2str(), address);
@@ -36,7 +36,7 @@ TEST(MAKE_ACCOUNT, AddressViewkey)
 {
     string const input = address + ',' + viewkey;
 
-    auto account = make_account(input);
+    auto account = parse_account(input);
 
     EXPECT_TRUE(account);
     EXPECT_EQ(account->ai2str(), address);
@@ -48,7 +48,7 @@ TEST(MAKE_ACCOUNT, Address)
 {
     string const input = address;
 
-    auto account = make_account(input);
+    auto account = parse_account(input);
 
     EXPECT_TRUE(account);
     EXPECT_EQ(account->ai2str(), address);
@@ -60,7 +60,7 @@ TEST(MAKE_ACCOUNT, WrongAddress)
 {
     string input = "toshortaddress";
 
-    auto account = make_account(input);
+    auto account = parse_account(input);
 
     EXPECT_FALSE(account);
 }

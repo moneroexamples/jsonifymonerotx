@@ -47,7 +47,7 @@ TEST(MAKE_ACCOUNT, FullAddressInfo)
                   + jsender["viewkey"].get<string>() + ","
                   + jsender["spendkey"].get<string>();
 
-    auto acc = make_account(acc_str);
+    auto acc = parse_account(acc_str);
 
     ASSERT_TRUE(acc);
 }
@@ -57,7 +57,7 @@ TEST(MAKE_ACCOUNT, IncorrectAddressInfo)
 {
     auto acc_str = "some gibrish instead of correct sender info";
 
-    auto acc = make_account(acc_str);
+    auto acc = parse_account(acc_str);
 
     ASSERT_FALSE(acc);
 }
@@ -71,7 +71,7 @@ TEST_F(FOUND_OBJECT_TEST, TestSearchWithFullAccInfo)
                   + jsender["viewkey"].get<string>() + ","
                   + jsender["spendkey"].get<string>();
 
-    auto acc = make_account(acc_str);
+    auto acc = parse_account(acc_str);
 
     FoundObjectProcessor obj_processor {
         std::move(mcore), std::move(acc)};
@@ -88,7 +88,7 @@ TEST_F(FOUND_OBJECT_TEST, TestSearchWithWithoutSpendkey)
     auto acc_str = jsender["address"].get<string>() + ","
                   + jsender["viewkey"].get<string>();
 
-    auto acc = make_account(acc_str);
+    auto acc = parse_account(acc_str);
 
     FoundObjectProcessor obj_processor {
         std::move(mcore), std::move(acc)};
@@ -107,7 +107,7 @@ TEST_F(FOUND_OBJECT_TEST, TestSearchWithRecipients)
                   + jsender["viewkey"].get<string>() + ","
                   + jsender["spendkey"].get<string>();
 
-    auto acc = make_account(acc_str);
+    auto acc = parse_account(acc_str);
 
     vector<unique_ptr<Account>> recipients;
 
@@ -120,7 +120,7 @@ TEST_F(FOUND_OBJECT_TEST, TestSearchWithRecipients)
             + pod_to_hex(recipient.viewkey) + ","
             + pod_to_hex(recipient.spendkey);
 
-        auto acc = make_account(acc_str);
+        auto acc = parse_account(acc_str);
         
         recipients.push_back(std::move(acc));
     }
