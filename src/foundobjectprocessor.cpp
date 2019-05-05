@@ -10,7 +10,6 @@ tx_to_hex(transaction const& tx)
         ::buff_to_hex_nodelimer(t_serializable_object_to_blob(tx));
 }
 
-
 FoundObjectProcessor::FoundObjectProcessor(
         unique_ptr<MicroCore> _mcore,
         unique_ptr<Account> _sender,
@@ -384,6 +383,7 @@ FoundObjectProcessor::add_outputs_data(
 
         uint64_t amount = tx.vout[i].amount;
 
+
         jtx["outputs"].push_back(
                     json {
                          {"index", i},
@@ -499,12 +499,21 @@ void
 FoundObjectProcessor::add_basic_acc_data(
         Account& acc, json& jtx) const
 {
+    string subaddr_idx_str = {};
+
+    if (acc.index())
+    {
+        stringstream ss;
+        ss << *acc.index();
+        subaddr_idx_str = ss.str();
+    }
 
     jtx = json {
         {"address", acc.ai2str()},
         {"viewkey", acc.vk2str()},
         {"spendkey", acc.sk2str()},
         {"is_subaddress", acc.is_subaddress()},
+        {"subaddress_index", subaddr_idx_str},
         {"outputs", json::array()}
     };
 }

@@ -16,6 +16,7 @@ process_program_options(int argc, const char *argv[])
     options["hash"] = ""s;
     options["sender"] = ""s;
     options["recipients"] = vector<string>{};
+    options["subaddress_indices"] = vector<string>{};
 
     options["blockchain_path"] = xmreg::get_default_lmdb_folder(
                 any_cast<network_type>(options["nettype"]));
@@ -52,6 +53,8 @@ process_program_options(int argc, const char *argv[])
             "transaction private key")
             ("recipients,r", po::value<vector<string>>()->multitoken(),
             "optional recipients' address,viewkey,spendkey")
+            ("subaddress-indices,i", po::value<vector<string>>()->multitoken(),
+            "optional subaddress indices for the recipients account_id,subaddress_id")
             ("save,w", "write json produced to a file")
             ("command,c", "save command used to generate the json file")
             ("display,d", "do not display json produced");
@@ -103,6 +106,10 @@ process_program_options(int argc, const char *argv[])
 
         if (vm.count("recipients"))
             options["recipients"] = vm["recipients"].as<vector<string>>();
+        
+        if (vm.count("subaddress-indices"))
+            options["subaddress_indices"] 
+                = vm["subaddress-indices"].as<vector<string>>();
 
         if (vm.count("save"))
             options["save"] = true;

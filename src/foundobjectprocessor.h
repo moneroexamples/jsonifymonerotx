@@ -23,7 +23,6 @@ public:
             unique_ptr<Account> _sender,
             vector<unique_ptr<Account>> _recipients);
 
-
     FoundObjectProcessor(
             unique_ptr<MicroCore> _mcore,
             unique_ptr<Account> _sender);
@@ -48,6 +47,7 @@ protected:
     unique_ptr<MicroCore> mcore;
     unique_ptr<Account> sender;
     vector<unique_ptr<Account>> recipients;
+    vector<subaddress_index> subaddress_indices;
 
     identifier_t
     construct_identifier(

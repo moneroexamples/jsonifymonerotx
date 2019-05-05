@@ -31,6 +31,8 @@ auto sender_str      = any_cast<string>(options["sender"]);
 auto message_str     = any_cast<string>(options["message"]);
 auto txprvkey_str    = any_cast<string>(options["txprvkey"]);
 auto recipients_vstr = any_cast<vector<string>>(options["recipients"]);
+auto subaddress_indices_vstr 
+    = any_cast<vector<string>>(options["subaddress_indices"]);
 auto save_json       = any_cast<bool>(options["save"]);
 auto save_command    = any_cast<bool>(options["command"]);
 auto no_display_json = any_cast<bool>(options["display"]);
@@ -137,7 +139,7 @@ if (!recipients_vstr.empty())
 {
     for (auto const& recipient_str: recipients_vstr)
     {
-        auto recpient = xmreg::make_account(recipient_str);
+        auto recpient = xmreg::parse_account(recipient_str);
 
         if (recpient)
             cout << "Recipient: " << *recpient << '\n';
@@ -153,8 +155,68 @@ if (!recipients_vstr.empty())
     }
 }
 
+vector<subaddress_index> subaddress_indices; 
+
+if (!subaddress_indices_vstr.empty())
+{
+    for (auto const& idx_str: subaddress_indices_vstr)
+    {
+        cout << idx_str << endl;
+        vector<string> split_index;
+
+        boost::split(split_index, idx_str, 
+                     boost::is_any_of(","));
+
+        if (split_index.empty() 
+                || split_index.size() != 2)
+        {
+            cerr << "Incorrect subaddress index given: "
+                  << idx_str << '\n';
+            return EXIT_SUCCESS;
+        }
+
+        try 
+        {
+            auto idx_major 
+                = boost::lexical_cast<uint32_t>(split_index[0]);
+            auto idx_minor 
+                = boost::lexical_cast<uint32_t>(split_index[1]);
+
+            subaddress_indices.push_back(
+                    subaddress_index {idx_major, idx_minor});
+
+        }
+        catch (boost::bad_lexical_cast const& e)
+        {
+            cerr << e.what() << '\n';
+            return EXIT_SUCCESS;
+        }
+    }
+    
+    cout << subaddress_indices.size() << endl;
+    cout << recipients.size() << endl;
+
+
+    if (subaddress_indices.size() != recipients.size())
+    {
+        cerr << "Number of recipients is differnent than "
+             << "number of subaddress indices provided\n";
+        return EXIT_SUCCESS;
+    }
+
+    // set indices for each account. Assuming we have 
+    // correct order 
+    
+    for (size_t i {0}; i < recipients.size(); ++i)
+    {
+        recipients[i]->set_index(subaddress_indices[i]);
+    }
+}
+
+
 xmreg::FoundObjectProcessor obj_processor {
-    std::move(mcore), std::move(sender), std::move(recipients)};
+    std::move(mcore), std::move(sender), 
+    std::move(recipients)};
 
 auto jobj = boost::apply_visitor(obj_processor, found_object);
 
