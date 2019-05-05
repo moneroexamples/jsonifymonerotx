@@ -134,5 +134,31 @@ TEST_F(FOUND_OBJECT_TEST, TestSearchWithRecipients)
     cout << jsonify_tx.dump(4) << '\n';
 }
 
+TEST(SUBADDRESS, HasSubaddressIndex)
+{
+    auto jtx = construct_jsontx("f81ecd0381c0b89f23cffe86a799e924af7b5843c663e8c07db98a14e913585e");
 
+    ASSERT_TRUE(jtx);
+
+    map<string, subaddress_index> expected_idx {
+        {"74kQqzoe4wm2zF67wkU9A6HALoHtfbdDYa9Dyw2Cv7w6XipiDmYT4q5GrmzKWWbh5yhGWfZCd35VUgKQa8L2pDacNqu6f1V", 
+            {39, 190}},
+        {"7AZiDv1bWNkaDvpXAGPRLpGPSCoy6NPvHLsZkW9Bk8a1Vfig5C83ASyL9uAvhy9rDjGeFdGscTEaEdMFeZUqYnUJKDDuiX2",
+            {49,53}},    
+        {"78bcyasmHaHK6PGvomfoGFJoy1uKv2G7cR7qqmMBYvyddLiumJkTZmxNZCkhgQftNTUMCi4XBbk2n8Ag1QjNtw1fMqPdWdJ",
+            {19,17}}, 
+        {"7Bg63RCU3LzRqiKXJqrpJjhf4WBdFx6q71mHkx2h5dandfvFZB2AQLj6VyBqJyRNTdLQNHYC9QKtQga9vfpFHqPuL1YeK7D",
+            {24,33}} 
+    };
+
+    for (auto const& recipient: jtx->recipients)        
+    {
+        //EXPECT_TRUE(bool {recipient.subaddr_idx});
+        //EXPECT_EQ(*recipient.subaddr_idx,
+                 //expected_idx[pod_to_hex(recipient.address)]);
+    }
+
+}
+
+//
 }

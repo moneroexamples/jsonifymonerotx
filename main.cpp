@@ -161,41 +161,17 @@ if (!subaddress_indices_vstr.empty())
 {
     for (auto const& idx_str: subaddress_indices_vstr)
     {
-        cout << idx_str << endl;
-        vector<string> split_index;
+        auto subaddr_idx = xmreg::parse_subaddress_index(idx_str);
 
-        boost::split(split_index, idx_str, 
-                     boost::is_any_of(","));
-
-        if (split_index.empty() 
-                || split_index.size() != 2)
-        {
-            cerr << "Incorrect subaddress index given: "
-                  << idx_str << '\n';
+        if (!subaddr_idx)
             return EXIT_SUCCESS;
-        }
 
-        try 
-        {
-            auto idx_major 
-                = boost::lexical_cast<uint32_t>(split_index[0]);
-            auto idx_minor 
-                = boost::lexical_cast<uint32_t>(split_index[1]);
-
-            subaddress_indices.push_back(
-                    subaddress_index {idx_major, idx_minor});
-
-        }
-        catch (boost::bad_lexical_cast const& e)
-        {
-            cerr << e.what() << '\n';
-            return EXIT_SUCCESS;
-        }
+        subaddress_indices.push_back(*subaddr_idx);
     }
     
     cout << subaddress_indices.size() << endl;
     cout << recipients.size() << endl;
-
+    
 
     if (subaddress_indices.size() != recipients.size())
     {
