@@ -148,7 +148,9 @@ TEST(SUBADDRESS, HasSubaddressIndex)
         {"78bcyasmHaHK6PGvomfoGFJoy1uKv2G7cR7qqmMBYvyddLiumJkTZmxNZCkhgQftNTUMCi4XBbk2n8Ag1QjNtw1fMqPdWdJ",
             {19,70}}, 
         {"7Bg63RCU3LzRqiKXJqrpJjhf4WBdFx6q71mHkx2h5dandfvFZB2AQLj6VyBqJyRNTdLQNHYC9QKtQga9vfpFHqPuL1YeK7D",
-            subaddress_index {24,33}} 
+            subaddress_index {24,33}},
+        {"56heRv2ANffW1Py2kBkJDy8xnWqZsSrgjLygwjua2xc8Wbksead1NK1ehaYpjQhymGK4S8NPL9eLuJ16CuEJDag8Hq3RbPV",
+            subaddress_index {0,0}},
     };
 
     for (auto const& recipient: jtx->recipients)        
