@@ -3,7 +3,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "mocks.h"
+#include "../src/xmregcore/tests/mocks.h"
 
 namespace
 {
@@ -142,23 +142,23 @@ TEST(SUBADDRESS, HasSubaddressIndex)
 
     map<string, subaddress_index> expected_idx {
         {"74kQqzoe4wm2zF67wkU9A6HALoHtfbdDYa9Dyw2Cv7w6XipiDmYT4q5GrmzKWWbh5yhGWfZCd35VUgKQa8L2pDacNqu6f1V", 
-            {39, 190}},
+            {49, 190}},
         {"7AZiDv1bWNkaDvpXAGPRLpGPSCoy6NPvHLsZkW9Bk8a1Vfig5C83ASyL9uAvhy9rDjGeFdGscTEaEdMFeZUqYnUJKDDuiX2",
             {49,53}},    
         {"78bcyasmHaHK6PGvomfoGFJoy1uKv2G7cR7qqmMBYvyddLiumJkTZmxNZCkhgQftNTUMCi4XBbk2n8Ag1QjNtw1fMqPdWdJ",
-            {19,17}}, 
+            {19,70}}, 
         {"7Bg63RCU3LzRqiKXJqrpJjhf4WBdFx6q71mHkx2h5dandfvFZB2AQLj6VyBqJyRNTdLQNHYC9QKtQga9vfpFHqPuL1YeK7D",
-            {24,33}} 
+            subaddress_index {24,33}} 
     };
 
     for (auto const& recipient: jtx->recipients)        
     {
-        //EXPECT_TRUE(bool {recipient.subaddr_idx});
-        //EXPECT_EQ(*recipient.subaddr_idx,
-                 //expected_idx[pod_to_hex(recipient.address)]);
+        EXPECT_TRUE(bool {recipient.subaddr_idx});
+        
+        EXPECT_EQ(*recipient.subaddr_idx,
+                 expected_idx[recipient.address_str()]);
     }
 
 }
 
-//
 }

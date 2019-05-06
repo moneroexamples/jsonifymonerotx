@@ -38,10 +38,6 @@ unique_ptr<Account>
 parse_account(string const& account_info,
               string const& split_by = ",");
 
-
-boost::optional<subaddress_index>
-parse_subaddress_index(string idx_str);
-
 }
 
 #endif // UTILS_HPP

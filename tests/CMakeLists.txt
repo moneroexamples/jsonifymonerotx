@@ -2,9 +2,10 @@ macro(add_om_test _TEST_NAME)
 
     add_executable(${_TEST_NAME}_tests
             ${_TEST_NAME}_tests.cpp
+            ../src/xmregcore/src/tools.cpp
             ../src/utils.cpp
             ../src/foundobjectprocessor.cpp
-            JsonTx.cpp)
+            ../src/xmregcore/tests/JsonTx.cpp)
 
     target_link_libraries(${_TEST_NAME}_tests
             gtest gtest_main
