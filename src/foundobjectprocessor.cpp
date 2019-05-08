@@ -92,6 +92,7 @@ FoundObjectProcessor::operator()(transaction const& tx) const
 
         auto identifier = construct_identifier(
                 tx, *sender, mcore.get());
+
         identifier.identify();
 
         add_payment_ids(identifier, jtx);        
@@ -209,25 +210,20 @@ public:
 FoundObjectProcessor::identifier_t
 FoundObjectProcessor::construct_identifier(
         transaction const& tx,
-        Account const& acc,
+        Account& acc,
         MicroCore* mc) const
 {
 
-    auto outputs = make_unique<Output>(&acc.ai(), &*acc.vk());
+    auto outputs = make_unique<Output>(&acc);
 
     auto integrated_payid 
-        = make_unique<IntegratedPaymentID>(&acc.ai(), &*acc.vk());
+        = make_unique<IntegratedPaymentID>(&acc.ai(), &(*acc.vk()));
 
     auto legacy_payid = make_unique<LegacyPaymentID>(nullptr, nullptr);
 
     auto inputs = acc.sk() ?
-                make_unique<RealInput>(&acc.ai(), &*acc.vk(), &*acc.sk(), mc)
+                make_unique<RealInput>(&acc, mc)
               : unique_ptr<RealInput> {make_unique<EmptyRealInput>()};
-
-    //auto inputs = acc.sk() ?
-                //unique_ptr<Input> {make_unique<RealInput>(
-                        //&acc.ai(), &*acc.vk(), &*acc.sk(), mc)}
-              //: make_unique<Input>(&acc.ai(), &*acc.vk());
 
     return make_identifier(tx,
                            std::move(outputs),
@@ -531,12 +527,23 @@ FoundObjectProcessor::decode_outputs(
     
     for (auto const& output: identifier.get<Output>()->get())
     {
-        joutputs.push_back(json {
-                output.idx_in_tx, 
-                pod_to_hex(output.pub_key), 
-                output.amount}); 
 
+        json joutput {output.idx_in_tx, 
+                      pod_to_hex(output.pub_key), 
+                      output.amount,
+                      "N/A"};
+
+        if (output.has_subaddress_index())
+        {
+            stringstream ss;
+            ss << output.subaddr_idx;
+
+            joutput.back() = ss.str(); 
+        }
+        
         total += output.amount;
+        
+        joutputs.push_back(std::move(joutput)); 
     } 
 
     jtx["total_recieved"] = total;

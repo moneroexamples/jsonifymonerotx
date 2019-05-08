@@ -133,6 +133,16 @@ else
     cout << "Sender's info not given or incorrect. "
             "Will proceed without it." << sender_str << '\n';
 
+if (sender->type() == xmreg::Account::PRIMARY)
+{
+    // if we have primary account, we can populate 
+    // its subaddresses map
+    auto primary_account 
+        = static_cast<xmreg::PrimaryAccount*>(sender.get());
+
+    primary_account->populate_subaddress_indices();
+}
+
 vector<unique_ptr<xmreg::Account>> recipients;
 
 if (!recipients_vstr.empty())
@@ -151,6 +161,18 @@ if (!recipients_vstr.empty())
             continue;
         }
 
+
+        //if (recpient->type() == xmreg::Account::PRIMARY)
+        //{
+            //// if we have primary account, we can populate 
+            //// its subaddresses map
+            
+            //auto primary_account 
+                //= static_cast<xmreg::PrimaryAccount*>(recpient.get());
+
+            //primary_account->populate_subaddress_indices();
+        //}
+
         recipients.push_back(std::move(recpient));
     }
 }
@@ -168,9 +190,6 @@ if (!subaddress_indices_vstr.empty())
 
         subaddress_indices.push_back(*subaddr_idx);
     }
-    
-    cout << subaddress_indices.size() << endl;
-    cout << recipients.size() << endl;
     
 
     if (subaddress_indices.size() != recipients.size())

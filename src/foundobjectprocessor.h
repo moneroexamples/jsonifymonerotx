@@ -52,7 +52,7 @@ protected:
     identifier_t
     construct_identifier(
             transaction const& tx,
-            Account const& acc,
+            Account& acc,
             MicroCore* mc) const;
 
     void
