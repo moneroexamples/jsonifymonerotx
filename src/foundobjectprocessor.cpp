@@ -244,9 +244,9 @@ FoundObjectProcessor::add_legacy_payment_id(
 
     auto legacy_payment_id = legacy_payment_id_identifier.get();
 
-    if (legacy_payment_id != crypto::null_hash)
+    if (legacy_payment_id)
     {
-        jtx["payment_id"] = pod_to_hex(legacy_payment_id);
+        jtx["payment_id"] = pod_to_hex(*legacy_payment_id);
     }
 }
 
@@ -348,12 +348,12 @@ FoundObjectProcessor::add_payment_ids(
                                     .get<IntegratedPaymentID>()
                                     ->raw());
 
-    crypto::hash8 integrated_payment_id
+    auto integrated_payment_id
             = identifier.get<IntegratedPaymentID>()->get();
 
-    if (integrated_payment_id != crypto::null_hash8)
+    if (integrated_payment_id)
     {
-        jtx["payment_id8e"] = pod_to_hex(integrated_payment_id);
+        jtx["payment_id8e"] = pod_to_hex(*integrated_payment_id);
         jtx["is_payment_id8_real"] = true;
     }
 
