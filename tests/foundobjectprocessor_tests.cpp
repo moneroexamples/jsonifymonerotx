@@ -3,6 +3,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+
+#include "../src/xmregcore/tests/JsonTx.h"
 #include "../src/xmregcore/tests/mocks.h"
 
 namespace
