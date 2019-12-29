@@ -45,6 +45,15 @@ if (hash_str.empty())
 
 cout << "Blockchain path: " << blockchain_path << '\n';
 
+if (!boost::filesystem::exists(blockchain_path / "data.mdb"))
+{
+    cerr << "Blockchain folder: " 
+         << blockchain_path 
+         << " does not exist!\n";
+
+    return EXIT_FAILURE;
+}
+
 
 // setup monero logger
 mlog_configure(mlog_get_default_log_path(""), true);
