@@ -26,6 +26,12 @@ protected:
       mlog_set_log("1");
 
       blockchain_path = get_default_lmdb_folder(nt);
+
+      if (!boost::filesystem::exists(blockchain_path)) 
+      {
+         FAIL() << blockchain_path << " does not exist!";
+      }  
+
       mcore = make_unique<MicroCore>(blockchain_path, nt);
 
       jtx = construct_jsontx("d7dcb2daa64b5718dad71778112d48ad62f4d5f54337037c420cb76efdd8a21c");
