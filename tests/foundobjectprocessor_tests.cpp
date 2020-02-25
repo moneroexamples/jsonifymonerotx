@@ -7,8 +7,6 @@
 #include "../src/xmregcore/tests/JsonTx.h"
 #include "../src/xmregcore/tests/mocks.h"
 
-namespace
-{
 using namespace std;
 using namespace cryptonote;
 using namespace xmreg;
@@ -25,7 +23,11 @@ protected:
       mlog_configure(mlog_get_default_log_path(""), true);
       mlog_set_log("1");
 
-      blockchain_path = get_default_lmdb_folder(nt);
+      if (blockchain_path.empty())
+      {
+        blockchain_path = get_default_lmdb_folder(nt);
+      }
+
 
       if (!boost::filesystem::exists(blockchain_path)) 
       {
@@ -39,9 +41,13 @@ protected:
 
   unique_ptr<MicroCore> mcore;
   network_type nt {network_type::STAGENET};
-  string blockchain_path;
   boost::optional<JsonTx> jtx;
+
+public:
+  static string blockchain_path;
 };
+
+string FOUND_OBJECT_TEST::blockchain_path {};
 
 TEST(MAKE_ACCOUNT, FullAddressInfo)
 {
@@ -172,7 +178,6 @@ TEST(SUBADDRESS, HasSubaddressIndex)
 }
 
 
-}
 
 int main(int argc, char **argv)
 {
@@ -180,9 +185,23 @@ int main(int argc, char **argv)
     ::testing::InitGoogleTest(&argc, argv);
 
     //from https://github.com/google/googletest/issues/765#issuecomment-215663692
-    for (int i = 1; i < argc; ++i) 
+    //for (int i = 1; i < argc; ++i) 
+    //{
+         //printf("arg %2d = %s\n", i, argv[i]);
+    //}
+    
+    if (argc == 3 && string {argv[1]}== "-b") 
     {
-         printf("arg %2d = %s\n", i, argv[i]);
+        cout << "Using blockchain path: " << argv[2] << endl;
+      
+        if (!boost::filesystem::exists(argv[2])) 
+        {
+            cerr << argv[2] << " does not exist!" << endl;
+            return EXIT_FAILURE;
+        }  
+        
+        FOUND_OBJECT_TEST::blockchain_path = argv[2]; 
+
     }
 
     return RUN_ALL_TESTS();
